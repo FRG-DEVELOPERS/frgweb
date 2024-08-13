@@ -108,41 +108,48 @@
         <!-- Custom JavaScript to handle form submission -->
         <script>
             document.addEventListener('DOMContentLoaded', () => {
-                const form = document.getElementById('contactForm');
-                form.addEventListener('submit', async (event) => {
-                    event.preventDefault();
-                    
-                    const name = document.getElementById('name').value;
-                    const email = document.getElementById('email').value;
-                    const phone = document.getElementById('phone').value;
-                    const message = document.getElementById('message').value;
+    const form = document.getElementById('contactForm');
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const phone = document.getElementById('phone').value;
+        const message = document.getElementById('message').value;
 
-                    const webhookUrl = 'https://discord.com/api/webhooks/1272883564601540683/Xwr9g251M4KUqDpfN97Jh0L1HZit8ZBly2d7h7_t42EwIJnUND8ozW_O4sT4htx9U-F-';
+        const webhookUrl = 'https://discord.com/api/webhooks/1272883564601540683/Xwr9g251M4KUqDpfN97Jh0L1HZit8ZBly2d7h7_t42EwIJnUND8ozW_O4sT4htx9U-F-';
 
-                    const payload = {
-                        content: `New contact form submission:\n**Name:** ${name}\n**Email:** ${email}\n**Phone:** ${phone}\n**Message:** ${message}`
-                    };
+        try {
+            // Fetch user's IP address
+            const ipResponse = await fetch('https://api.ipify.org?format=json');
+            const ipData = await ipResponse.json();
+            const userIP = ipData.ip;
 
-                    try {
-                        const response = await fetch(webhookUrl, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(payload)
-                        });
+            // Prepare the payload with IP address
+            const payload = {
+                content: `New contact form submission:\n**Name:** ${name}\n**Email:** ${email}\n**Phone:** ${phone}\n**Message:** ${message}\n**IP Address:** ${userIP}`
+            };
 
-                        if (response.ok) {
-                            document.getElementById('submitSuccessMessage').classList.remove('d-none');
-                            form.reset();
-                        } else {
-                            document.getElementById('submitErrorMessage').classList.remove('d-none');
-                        }
-                    } catch (error) {
-                        document.getElementById('submitErrorMessage').classList.remove('d-none');
-                    }
-                });
+            // Send the payload to the webhook
+            const response = await fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
             });
+
+            if (response.ok) {
+                document.getElementById('submitSuccessMessage').classList.remove('d-none');
+                form.reset();
+            } else {
+                document.getElementById('submitErrorMessage').classList.remove('d-none');
+            }
+        } catch (error) {
+            document.getElementById('submitErrorMessage').classList.remove('d-none');
+        }
+    });
+});
         </script>
     </body>
 </html>
